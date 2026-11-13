@@ -340,6 +340,8 @@ def test_a_group_or_world_writable_overlay_directory_is_refused(fake_home, dir_m
         )
     finally:
         (config_home() / "passkey").chmod(0o700)
+
+
 def _write_named_overlay(dirname: str, text: str) -> None:
     overlay = config_home() / dirname / "registry.toml"
     overlay.parent.mkdir(parents=True, exist_ok=True)
