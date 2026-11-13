@@ -11,9 +11,9 @@ import pytest
 
 from passkey.cli import main
 
-NOTICE = "credmap is now passkey; `credmap` still runs for this release\n"
-
 from .conftest import ALL_SECRETS
+
+NOTICE = "credmap is now passkey; `credmap` still runs for this release\n"
 
 
 def run(capsys, *argv) -> tuple[int, str]:
@@ -191,7 +191,9 @@ def test_an_owner_only_overlay_is_applied_silently(fake_home, capsys):
     assert err == ""
 
 
-def test_the_credmap_console_script_notices_once_and_keeps_json(fake_home, capsys, monkeypatch):
+def test_the_credmap_console_script_notices_once_and_keeps_json(
+    fake_home, capsys, monkeypatch
+):
     """The installed `credmap` entry point calls main() with argv left as None."""
     monkeypatch.setattr(sys, "argv", ["credmap", "--json"])
     code = main()
