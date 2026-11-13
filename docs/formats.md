@@ -2,7 +2,7 @@
 
 Every path in the registry declares a `fmt`. The parser for that format turns
 the file into a list of profiles, each with a name, a flat `fields` mapping,
-and optionally an expiry. Parsers live in `src/credmap/parsers.py`.
+and optionally an expiry. Parsers live in `src/passkey/parsers.py`.
 
 Two rules hold for every parser:
 

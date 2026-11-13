@@ -1,7 +1,7 @@
 # Built-in stores
 
 The registry ships 26 stores. Each is a `Store` literal in
-`src/credmap/registry.py`, and each is data, not code: adding a provider means
+`src/passkey/registry.py`, and each is data, not code: adding a provider means
 adding a literal, not a parser or a special case.
 
 Conventions used below:
@@ -98,7 +98,7 @@ threshold. See [doctor.md](doctor.md).
 
 ## Path resolution
 
-All path rules live in `src/credmap/resolve.py`. For each path spec, in order:
+All path rules live in `src/passkey/resolve.py`. For each path spec, in order:
 
 1. If the spec names an `env` variable and it is set to a non-empty value, that value is the path. `KUBECONFIG` is a list split on the OS path separator, and every element becomes its own path entry.
 2. Otherwise, if the spec names a `root_env` and it is set, the path is `$ROOT/<rel>`.

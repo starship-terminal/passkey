@@ -14,8 +14,8 @@ from pathlib import Path
 
 import pytest
 
-from credmap.doctor import _human_size, diagnose
-from credmap.model import FoundPath, PathSpec, Profile, Store, StoreResult
+from passkey.doctor import _human_size, diagnose
+from passkey.model import FoundPath, PathSpec, Profile, Store, StoreResult
 
 
 @pytest.fixture
@@ -144,7 +144,7 @@ def _write(path: Path, text: str, mode: int = 0o600) -> Path:
 
 
 def scanned(store: Store) -> StoreResult:
-    from credmap.scan import scan_store
+    from passkey.scan import scan_store
 
     return scan_store(store)
 
@@ -316,8 +316,8 @@ def test_size_picks_its_unit_by_magnitude(size, expected):
 
 def test_offline_findings_never_reach_error_level(fake_home):
     """Only a probe can prove a credential dead, and only error exits 1."""
-    from credmap.registry import load
-    from credmap.scan import scan
+    from passkey.registry import load
+    from passkey.scan import scan
 
     findings = diagnose(scan(load()))
     assert findings, "the fixture home has problems worth reporting"

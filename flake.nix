@@ -13,10 +13,12 @@
     in
     {
       packages = forAllSystems (pkgs: rec {
-        default = credmap;
+        default = passkey;
+        # Alias for flakes that still ask for the previous attribute.
+        credmap = passkey;
 
-        credmap = pkgs.python3Packages.buildPythonApplication {
-          pname = "credmap";
+        passkey = pkgs.python3Packages.buildPythonApplication {
+          pname = "passkey";
           # Single source of truth: the tag, the wheel and the derivation
           # cannot drift apart.
           version = (lib.importTOML ./pyproject.toml).project.version;
@@ -41,13 +43,13 @@
           # depend on them, so declare it.
           nativeCheckInputs = [ pkgs.coreutils ]
             ++ (with pkgs.python3Packages; [ pytestCheckHook ]);
-          pythonImportsCheck = [ "credmap" ];
+          pythonImportsCheck = [ "passkey" ];
 
           meta = {
             description = "Read-only discovery for credential stores scattered across your machine";
-            homepage = "https://github.com/c-wenlong/credmap";
+            homepage = "https://github.com/starship-terminal/passkey";
             license = lib.licenses.mit;
-            mainProgram = "credmap";
+            mainProgram = "passkey";
             platforms = lib.platforms.unix;
           };
         };

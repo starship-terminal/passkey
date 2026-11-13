@@ -2,7 +2,9 @@
 
 This module is data, not behaviour. Adding a provider should mean adding a
 ``Store`` here — never touching the scanner. Users extend it without editing
-the package via ``~/.config/credmap/registry.toml`` (see :func:`load`).
+the package via ``~/.config/passkey/registry.toml`` (see :func:`load`).
+A ``~/.config/credmap/registry.toml`` left from the previous name is read
+when the new file is absent.
 
 Conventions worth knowing before adding an entry:
 
@@ -560,7 +562,16 @@ OVERLAY_WARNING = ""
 
 
 def overlay_path() -> Path:
-    return config_home() / "credmap" / "registry.toml"
+    """The overlay to read. New path wins; the old name is the fallback.
+
+    Never writes, and never moves the old file. A missing directory is not
+    created, so asking for the path does not touch the disk.
+    """
+    current = config_home() / "passkey" / "registry.toml"
+    legacy = config_home() / "credmap" / "registry.toml"
+    if current.is_file() or not legacy.is_file():
+        return current
+    return legacy
 
 
 def _unsafe_overlay(path: Path) -> str:
@@ -573,7 +584,7 @@ def _unsafe_overlay(path: Path) -> str:
 
     The directory counts too. Write permission on a directory is permission to
     unlink and recreate what is in it, so a group-writable
-    ``~/.config/credmap`` hands over the same power as a group-writable
+    ``~/.config/passkey`` hands over the same power as a group-writable
     ``registry.toml`` — the 0600 mode on the file it replaces is whatever the
     attacker chose. Both are checked by the same rule, and the message says
     which one is at fault so the reader knows what to chmod.

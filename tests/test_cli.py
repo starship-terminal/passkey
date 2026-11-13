@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from credmap.cli import main
+from passkey.cli import main
 
 from .conftest import ALL_SECRETS
 
@@ -30,7 +30,7 @@ def write_overlay(home, text: str, mode: int = 0o600, dir_mode: int = 0o700) -> 
     umask 002 gets 0775 out of ``mkdir``. Leaving that to chance made this
     helper pass on CI and fail on such a machine.
     """
-    overlay = home / ".config/credmap/registry.toml"
+    overlay = home / ".config/passkey/registry.toml"
     overlay.parent.mkdir(parents=True, exist_ok=True)
     overlay.write_text(text, encoding="utf-8")
     overlay.chmod(mode)

@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-credmap is a single-command CLI with no maintenance branch. Only the current
+passkey is a single-command CLI with no maintenance branch. Only the current
 minor gets fixes; upgrading is a rebuild (`nix build`) or `uv tool upgrade`.
 
 | Version | Supported |
@@ -13,7 +13,7 @@ minor gets fixes; upgrading is a rebuild (`nix build`) or `uv tool upgrade`.
 
 **Do not open a public issue describing a security problem.**
 
-GitHub's [private vulnerability reporting](https://github.com/c-wenlong/credmap/security/advisories/new)
+GitHub's [private vulnerability reporting](https://github.com/starship-terminal/passkey/security/advisories/new)
 is the preferred channel. It is not enabled on this repository yet, and the
 link only works once a maintainer turns it on under Settings → Code security.
 Until then, open a public issue saying only that you have found a security
@@ -42,7 +42,7 @@ that page before reporting, so a documented decision does not arrive as a bug.
 
 In scope:
 
-- **A secret reaching default output.** credmap reads AWS, gcloud, kubeconfig,
+- **A secret reaching default output.** passkey reads AWS, gcloud, kubeconfig,
   Docker, gh, npm and 20 more: 26 built-in stores in all. Every field it prints goes
   through one `scrub` chokepoint with default-deny masking. A channel that
   prints a value without passing through `scrub` is the highest-severity bug
@@ -64,11 +64,11 @@ Known and by design, so not a vulnerability:
 - **`--reveal` prints secrets in full.** That is what it is for. It exists only
   on `show`, and no other flag implies it. Its output is not safe to paste.
 - **`--check` makes network calls**, indirectly, by running each provider's own
-  CLI. It is off by default; without it credmap never leaves the filesystem.
+  CLI. It is off by default; without it passkey never leaves the filesystem.
 - **The fingerprint shows the last four characters** of a secret 16 characters
   or longer, plus its length.
-- **The overlay at `~/.config/credmap/registry.toml` has your full authority.**
-  It can point credmap at any readable file and declare any command for
+- **The overlay at `~/.config/passkey/registry.toml` has your full authority.**
+  It can point passkey at any readable file and declare any command for
   `--check`. A group- or world-writable overlay file is refused with a warning,
   and its containing directory is checked by the same rule, because write
   permission on a directory is permission to replace the file inside it.

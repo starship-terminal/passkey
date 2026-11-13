@@ -4,7 +4,7 @@
 |---|---|
 | Python | 3.11 or newer (`tomllib` is stdlib from 3.11) |
 | Runtime dependency | PyYAML 6+ |
-| Build backend | hatchling, wheel from `src/credmap` |
+| Build backend | hatchling, wheel from `src/passkey` |
 | Package manager | uv |
 | Tests | pytest, 230 tests, about 5 s (the liveness tests run stub CLIs with real timeouts) |
 | Lint | ruff, `check` and `format`, line length 88, target py311 |
@@ -14,8 +14,8 @@ uv sync                      # after a fresh clone or a move; the venv is not po
 uv run pytest -q             # run the suite
 uv run ruff check .          # lint, same gate as CI
 uv run ruff format .         # format, CI checks this with --check
-uv run python -m credmap     # run without installing
-uv tool install . --force    # put credmap on PATH from this checkout
+uv run python -m passkey     # run without installing
+uv tool install . --force    # put passkey on PATH from this checkout
 uv build                     # sdist and wheel into dist/
 
 nix build                    # the same package nix-darwin consumers get; runs the tests

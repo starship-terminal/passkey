@@ -63,7 +63,7 @@ could not place, which can be the password, so netrc was fixed too.
 | 18 | `doctor.py` `_empty` | A store whose file failed to parse gets both the parse error and "no profiles were parsed". | **fixed** in v0.1.2 |
 | 19 | `registry.py` `find` | An empty query matches every store. | **fixed** in v0.1.2 |
 | 20 | `liveness.py` `check` | No overall deadline across probes, and exceptions inside a probe are never read from the future, so they vanish. | **fixed** in v0.1.2: deadline of longest timeout plus 5 s; exceptions become `unknown` |
-| 21 | `cli.py` default verb | `credmap aws` becomes `scan aws` and dies with an argparse error. | **fixed** in v0.1.2: a bare store name becomes `where` |
+| 21 | `cli.py` default verb | `passkey aws` becomes `scan aws` and dies with an argparse error. | **fixed** in v0.1.2: a bare store name becomes `where` |
 | 22 | `liveness.py` `_probe_store` | Azure's `extract = "id"` is dead configuration: `extract` only applies to per-profile probes. | **fixed** in v0.1.2 |
 | 23 | `registry.py` overlay loader | The overlay is read with no permission check. A group- or world-writable `registry.toml` hands another local user arbitrary file read and, under `--check`, argv execution. | **fixed** in v0.1.2: such a file is ignored with a warning on stderr. Directory check is issue 31 |
 | 24 | `registry.py` AWS store | `credential_process`, `web_identity_token_file` and `role_session_name` are masked. | **fixed** in v0.1.2: added to `id_fields` |

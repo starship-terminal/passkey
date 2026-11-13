@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 from . import __version__, registry
 from .doctor import diagnose
@@ -24,24 +25,24 @@ from .scan import scan, scan_store
 
 EPILOG = """\
 examples:
-  credmap                      what credential stores exist on this machine
-  credmap where gcp            where do my Google credentials live
-  credmap show aws             every AWS profile, secrets masked
-  credmap doctor --check       find problems, verifying against each provider
-  credmap paths                the full registry of known paths
+  passkey                      what credential stores exist on this machine
+  passkey where gcp            where do my Google credentials live
+  passkey show aws             every AWS profile, secrets masked
+  passkey doctor --check       find problems, verifying against each provider
+  passkey paths                the full registry of known paths
 """
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="credmap",
+        prog="passkey",
         description=(
             "Read-only discovery for credential stores scattered across your machine."
         ),
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--version", action="version", version=f"credmap {__version__}")
+    parser.add_argument("--version", action="version", version=f"passkey {__version__}")
     sub = parser.add_subparsers(dest="cmd")
 
     def add(name: str, help_: str) -> argparse.ArgumentParser:
@@ -93,7 +94,7 @@ def registry_stores() -> tuple[Store, ...]:
     """
     stores = load()
     if registry.OVERLAY_WARNING:
-        print(f"credmap: {registry.OVERLAY_WARNING}", file=sys.stderr)
+        print(f"passkey: {registry.OVERLAY_WARNING}", file=sys.stderr)
     return stores
 
 
@@ -132,8 +133,8 @@ def cmd_paths(args) -> int:
 def cmd_where(args) -> int:
     matches = find(registry_stores(), args.query)
     if not matches:
-        print(f"credmap: no store matches '{args.query}'", file=sys.stderr)
-        print("try: credmap paths", file=sys.stderr)
+        print(f"passkey: no store matches '{args.query}'", file=sys.stderr)
+        print("try: passkey paths", file=sys.stderr)
         return 2
 
     results = [scan_store(store) for store in matches]
@@ -154,7 +155,7 @@ def cmd_where(args) -> int:
 def cmd_show(args) -> int:
     matches = find(registry_stores(), args.store)
     if not matches:
-        print(f"credmap: no store matches '{args.store}'", file=sys.stderr)
+        print(f"passkey: no store matches '{args.store}'", file=sys.stderr)
         return 2
     result = scan_store(matches[0])
     if args.check:
@@ -190,8 +191,8 @@ HANDLERS = {
 def _rewrite(raw: list[str]) -> list[str]:
     """Supply the verb a bare invocation left out.
 
-    Two shapes have no verb. ``credmap --all`` is scan with a flag, and
-    ``credmap aws`` is a provider name — which used to become ``scan aws`` and
+    Two shapes have no verb. ``passkey --all`` is scan with a flag, and
+    ``passkey aws`` is a provider name — which used to become ``scan aws`` and
     die on argparse, when the only thing it could sensibly mean is ``where
     aws``. A first token that names nothing in the registry still falls
     through to ``scan``, so an unknown word is still rejected as one.
@@ -206,6 +207,13 @@ def _rewrite(raw: list[str]) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # The `credmap` console script is the previous name. Say so once, then
+    # run the same command. python -m credmap prints the same line itself.
+    invoked = Path(sys.argv[0]).name if argv is None else ""
+    if invoked == "credmap":
+        sys.stderr.write(
+            "credmap is now passkey; `credmap` still runs for this release\n"
+        )
     raw = _rewrite(list(sys.argv[1:] if argv is None else argv))
 
     args = build_parser().parse_args(raw)

@@ -1,12 +1,12 @@
 name: Bug report
-description: Report something credmap got wrong
+description: Report something passkey got wrong
 title: "[Bug]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for the report. **Redact before you paste.** credmap masks secrets
+        Thanks for the report. **Redact before you paste.** passkey masks secrets
         by default, but paths, profile names and hostnames can still identify you,
         and `show --reveal` output is not safe to share at all. Never attach a real
         credential file: `tests/conftest.py` shows how to build a synthetic one.
@@ -15,8 +15,8 @@ body:
     id: description
     attributes:
       label: What happened?
-      description: What did credmap do, and what did you expect instead?
-      placeholder: I ran `credmap show aws` and the profile was listed as dead, but it works.
+      description: What did passkey do, and what did you expect instead?
+      placeholder: I ran `passkey show aws` and the profile was listed as dead, but it works.
     validations:
       required: true
 
@@ -29,7 +29,7 @@ body:
         the problem easier to see. Redact anything you would not post publicly.
       render: shell
       placeholder: |
-        $ credmap doctor --json
+        $ passkey doctor --json
         ...
     validations:
       required: true
@@ -41,7 +41,7 @@ body:
       description: What has to exist on the machine for this to happen?
       placeholder: |
         1. Have `~/.aws/credentials` with two profiles
-        2. Run `credmap show aws`
+        2. Run `passkey show aws`
         3. See ...
     validations:
       required: true
@@ -51,12 +51,12 @@ body:
     attributes:
       label: Environment
       description: >-
-        OS, Python version, and the credmap version from `credmap --version`
-        (or `uv run credmap --version` from a checkout).
+        OS, Python version, and the passkey version from `passkey --version`
+        (or `uv run passkey --version` from a checkout).
       placeholder: |
         - OS: macOS 15.5
         - Python: 3.13.8
-        - credmap: 0.1.4
+        - passkey: 0.1.4
         - Installed via: nix / uv tool / checkout
     validations:
       required: true

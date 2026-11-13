@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from credmap.registry import BUILTIN
+from passkey.registry import BUILTIN
 
 
 def override_vars() -> tuple[str, ...]:

@@ -3,7 +3,7 @@
 Every probe here is a shell script written into a temporary directory that is
 put at the front of ``PATH``. No real provider CLI is ever invoked, and no
 test touches the real home: the store and result objects are built straight
-from :mod:`credmap.model`.
+from :mod:`passkey.model`.
 """
 
 from __future__ import annotations
@@ -16,9 +16,9 @@ from pathlib import Path
 
 import pytest
 
-from credmap import liveness
-from credmap.liveness import MAX_OUTPUT, _run, check
-from credmap.model import (
+from passkey import liveness
+from passkey.liveness import MAX_OUTPUT, _run, check
+from passkey.model import (
     DEAD,
     LIVE,
     NO_CLI,
