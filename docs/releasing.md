@@ -1,7 +1,7 @@
 # Releasing
 
 Decision, recorded 2026-09-09: **ship a `flake.nix` in the repo as the install
-path for the author's machine, publish to PyPI as `credmap-cli` if and when
+path for the author's machine, publish to PyPI as `passkey` if and when
 the repo goes public, and do not run a Homebrew tap.** The reasoning is in
 [install.md](install.md#homebrew) and in the comparison below.
 
@@ -22,11 +22,11 @@ the repo goes public, and do not run a Homebrew tap.** The reasoning is in
 2. **Decide visibility.** Public unlocks PyPI and removes the access-token bootstrap. Private is fine and flake-only.
 3. **The secret leaks are fixed**, in v0.1.1 and v0.1.3. A release that prints a credential on a malformed file should not be one people install; see [known-issues.md](known-issues.md).
 4. **`flake.nix` is in the repo.** After changing it, run `nix build` and commit the regenerated `flake.lock`.
-5. **PyPI is wired but switched off.** `pyproject.toml` carries the `credmap-cli` name and metadata, and `release.yml` has the publish job, but the job is skipped unless the repository variable `PUBLISH_TO_PYPI` is `true`. Turning it on takes three steps, the first two of which cannot be done from a workflow:
+5. **PyPI is wired but switched off.** `pyproject.toml` carries the `passkey` name and metadata, and `release.yml` has the publish job, but the job is skipped unless the repository variable `PUBLISH_TO_PYPI` is `true`. Turning it on takes three steps, the first two of which cannot be done from a workflow:
 
    ```
    1. pypi.org → account settings → Publishing → add a pending publisher:
-      project credmap-cli, owner c-wenlong, repo credmap,
+      project passkey, owner starship-terminal, repo passkey,
       workflow release.yml, environment pypi
    2. GitHub repo settings → Environments → new environment named "pypi"
    3. gh variable set PUBLISH_TO_PYPI --body true
@@ -37,27 +37,27 @@ the repo goes public, and do not run a Homebrew tap.** The reasoning is in
 ## Cutting a release
 
 The version lives in two places today: `pyproject.toml` and
-`src/credmap/__init__.py`. Nothing enforces that they agree except the CI
+`src/passkey/__init__.py`. Nothing enforces that they agree except the CI
 guard below, so bump both.
 
 ```bash
-# bump version in pyproject.toml and src/credmap/__init__.py,
+# bump version in pyproject.toml and src/passkey/__init__.py,
 # add a section to CHANGELOG.md, then
 uv lock                      # keeps uv.lock in step, or CI's --locked sync fails
 git commit -am "Release 0.1.4"
-git tag -a v0.1.4 -m "credmap 0.1.4"
+git tag -a v0.1.4 -m "passkey 0.1.4"
 git push origin main
 git push origin v0.1.4
 ```
 
 What fires:
 
-- **Nix**: nothing. The tag exists to be pinned. Consumers edit their input and run `nix flake update credmap`.
+- **Nix**: nothing. The tag exists to be pinned. Consumers edit their input and run `nix flake update passkey`.
 - **GitHub Actions**: `release.yml` runs the suite, checks the tag against both version literals, builds with `uv build`, and creates a GitHub release with the sdist and wheel attached. It also publishes to PyPI with Trusted Publishing and PEP 740 attestations, when `PUBLISH_TO_PYPI` is set. `ci.yml` runs the suite on every push and pull request on Linux and macOS, Python 3.11 and 3.13.
 
 Then on the author's machine: make the dotfiles edits in
 [install.md](install.md#with-nix-recommended-for-nix-darwin-and-home-manager-users),
-run the rebuild, and `uv tool uninstall credmap`.
+run the rebuild, and `uv tool uninstall passkey`.
 
 ## `flake.nix`
 
@@ -77,10 +77,11 @@ Notes worth keeping:
 
 ## PyPI metadata
 
-In [`pyproject.toml`](../pyproject.toml). The distribution is `credmap-cli`
-while the import package and the console script stay `credmap`; the
-`[tool.hatch.build.targets.wheel] packages` line is what allows that, by
-overriding hatchling's name-based inference of the source directory.
+In [`pyproject.toml`](../pyproject.toml). The distribution, the import
+package, and the console script are all `passkey`. `credmap` remains a
+console script for one release. The
+`[tool.hatch.build.targets.wheel] packages` line lists `src/passkey` and
+the `src/credmap` shim, overriding hatchling's name-based inference.
 
 Do not add a `License :: OSI Approved` classifier alongside `license = "MIT"`;
 build tools may reject having both. Hatchling validates classifiers against the
@@ -106,26 +107,26 @@ should point at the immutable PyPI sdist rather than a GitHub tarball: brew
 livecheck detects PyPI URLs with no configuration and `brew bump-formula-pr
 --version=` rewrites the hashed URL natively.
 
-Tap repo `c-wenlong/homebrew-tap`, formula at `Formula/credmap.rb`, scaffolded
-by `brew tap-new c-wenlong/homebrew-tap`, which also generates an
+Tap repo `starship-terminal/homebrew-passkey`, formula at `Formula/passkey.rb`, scaffolded
+by `brew tap-new starship-terminal/homebrew-passkey`, which also generates an
 `autobump.yml` that runs `brew bump --no-fork --open-pr` with the default
 token. The popular `mislav/bump-homebrew-formula-action` cannot bump formulae
 with PyPI `resource` blocks, by its own README.
 
 ```ruby
-class Credmap < Formula
+class Passkey < Formula
   include Language::Python::Virtualenv
 
   desc "Read-only discovery for credential stores scattered across your machine"
-  homepage "https://github.com/c-wenlong/credmap"
-  url "https://files.pythonhosted.org/packages/XX/XX/XXXX/credmap_cli-0.1.0.tar.gz"  # fill in after first upload
+  homepage "https://github.com/starship-terminal/passkey"
+  url "https://files.pythonhosted.org/packages/XX/XX/XXXX/passkey-0.1.0.tar.gz"  # fill in after first upload
   sha256 "FILL IN"
   license "MIT"
-  head "https://github.com/c-wenlong/credmap.git", branch: "main"
+  head "https://github.com/starship-terminal/passkey.git", branch: "main"
 
   depends_on "python@3.14"
 
-  pypi_packages package_name: "credmap-cli"
+  pypi_packages package_name: "passkey"
 
   resource "pyyaml" do
     url "https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz"
@@ -137,9 +138,9 @@ class Credmap < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/credmap --version")
+    assert_match version.to_s, shell_output("#{bin}/passkey --version")
     require "json"
-    JSON.parse(shell_output("#{bin}/credmap paths --json"))
+    JSON.parse(shell_output("#{bin}/passkey paths --json"))
   end
 end
 ```
@@ -148,8 +149,8 @@ On nix-darwin the tap entry must carry trust, and a fully qualified brew name
 keeps the tap alive through `cleanup = "zap"`:
 
 ```nix
-taps = [ { name = "c-wenlong/tap"; trusted = true; } ];
-brews = [ "c-wenlong/tap/credmap" ];
+taps = [ { name = "starship-terminal/passkey"; trusted = true; } ];
+brews = [ "starship-terminal/passkey/passkey" ];
 ```
 
 ## Nixpkgs proper

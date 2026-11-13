@@ -5,9 +5,14 @@ by number are the review ledger in [docs/known-issues.md](docs/known-issues.md).
 
 ## Unreleased
 
-Repository, documentation and CI work. No behaviour change: the only edits
-under `src/` are ruff's formatting, three `try`/`except`/`pass` blocks
-rewritten as `contextlib.suppress`, and long string literals split.
+The program is Passkey. The command, the import package, the Nix package,
+and the distribution name are `passkey`. `credmap` remains a console script
+for this release and prints a one-line notice. `~/.config/passkey` is read
+first; `~/.config/credmap` is the fallback when the new file is absent.
+
+Repository, documentation and CI work. Other edits under `src/` are ruff's
+formatting, three `try`/`except`/`pass` blocks rewritten as
+`contextlib.suppress`, and long string literals split.
 
 ### Documentation
 
@@ -88,7 +93,7 @@ The rest of the 2026-09-09 review, plus the packaging to ship it.
 ### Packaging
 
 - MIT `LICENSE`.
-- `flake.nix` and `flake.lock`: `nix build` produces the package and runs the suite; `nix run github:c-wenlong/credmap` works.
+- `flake.nix` and `flake.lock`: `nix build` produces the package and runs the suite; `nix run github:starship-terminal/passkey` works.
 - The PyPI distribution is `credmap-cli`; the import package and command remain `credmap`. `credmap` on PyPI is an unrelated 2022 upload.
 - `ci.yml` runs the suite on Linux and macOS against Python 3.11 and 3.13. `release.yml` builds on a tag, publishes a GitHub release with the artifacts, and uploads to PyPI through Trusted Publishing.
 

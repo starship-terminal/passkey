@@ -1,3 +1,5 @@
-"""credmap — read-only discovery for credential stores scattered across a machine."""
+"""Compatibility shim. The package is passkey. Removed next release."""
 
-__version__ = "0.1.4"
+from passkey import __version__
+
+__all__ = ["__version__"]

@@ -1,6 +1,6 @@
 # Command reference
 
-`credmap` has five verbs. `scan` is the default: running `credmap` with no verb,
+`passkey` has five verbs. `scan` is the default: running `passkey` with no verb,
 or with only flags, runs `scan`.
 
 | Verb | Arguments | Flags | What it does |
@@ -12,7 +12,7 @@ or with only flags, runs `scan`.
 | `doctor` | none | `--json`, `--check` | Anomalies only. Exits 1 when a credential is provably dead. |
 
 Global flags: `-h`/`--help` and `--version`. `--json` is per-verb, so it goes
-after the verb (`credmap paths --json`). `credmap --json` still works because
+after the verb (`passkey paths --json`). `passkey --json` still works because
 the missing verb is rewritten to `scan`.
 
 Flags are not global. `--all` is `scan` only, `--reveal` is `show` only, and
@@ -26,11 +26,11 @@ kind, or alias substring. `show` uses the first match; `where` prints all of
 them. See [stores.md](stores.md) for the id and alias of every built-in.
 
 ```
-credmap where gcp        # gcloud, gcloud-adc
-credmap where k8s        # kube
-credmap show aws
-credmap show aws --check
-credmap show aws --reveal
+passkey where gcp        # gcloud, gcloud-adc
+passkey where k8s        # kube
+passkey show aws
+passkey show aws --check
+passkey show aws --reveal
 ```
 
 ## Exit codes
@@ -39,10 +39,10 @@ credmap show aws --reveal
 |---|---|
 | 0 | Success. `doctor` returns 0 when nothing is at `error` level, so warnings and info alone do not fail a pre-flight check. |
 | 1 | `doctor` found an `error`-level finding. Today that means a profile probed with `--check` was rejected by its provider. |
-| 2 | `where` or `show` matched nothing, or argparse rejected a flag. A first token that names a store (`credmap aws`) is rewritten to `where aws`; any other unknown first token becomes `scan <token>`, which argparse rejects with the same code. |
+| 2 | `where` or `show` matched nothing, or argparse rejected a flag. A first token that names a store (`passkey aws`) is rewritten to `where aws`; any other unknown first token becomes `scan <token>`, which argparse rejects with the same code. |
 | 130 | Interrupted with Ctrl-C. |
 
-A closed stdout pipe (`credmap | head`) is swallowed and exits 0.
+A closed stdout pipe (`passkey | head`) is swallowed and exits 0.
 
 ## Offline by default
 

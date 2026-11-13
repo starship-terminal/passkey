@@ -9,10 +9,10 @@ from pathlib import Path
 
 import pytest
 
-from credmap.model import EXPIRED, PathSpec
-from credmap.parsers import parse_ini, parse_inidir, parse_sqlite_gcloud
-from credmap.registry import load
-from credmap.scan import scan, scan_store
+from passkey.model import EXPIRED, PathSpec
+from passkey.parsers import parse_ini, parse_inidir, parse_sqlite_gcloud
+from passkey.registry import load
+from passkey.scan import scan, scan_store
 
 
 def result_for(sid: str):
@@ -168,8 +168,8 @@ def test_context_lands_in_note_not_error(fake_home):
 
 def test_partial_read_keeps_what_it_parsed():
     """A parser that fails midway still reports the profiles it did get."""
-    from credmap.model import Profile
-    from credmap.parsers import ParseResult, _fail
+    from passkey.model import Profile
+    from passkey.parsers import ParseResult, _fail
 
     partial = _fail("query failed: no such column", [Profile(name="someone")])
     assert partial.error == "query failed: no such column"

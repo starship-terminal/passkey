@@ -1,7 +1,7 @@
-# credmap documentation
+# passkey documentation
 
 Read-only discovery for credential stores scattered across your machine.
-credmap finds them, parses them, masks the secrets, and tells you what is
+passkey finds them, parses them, masks the secrets, and tells you what is
 wrong. It never writes to a credential file.
 
 ## Using it
@@ -16,7 +16,7 @@ wrong. It never writes to a credential file.
 | [json.md](json.md) | The `--json` schema for every verb |
 | [redaction.md](redaction.md) | How masking decides what to hide, and `--reveal` |
 | [registry-toml.md](registry-toml.md) | Adding providers or overriding built-ins without editing the package |
-| [security.md](security.md) | What credmap does and does not guarantee |
+| [security.md](security.md) | What passkey does and does not guarantee |
 
 ## Working on it
 

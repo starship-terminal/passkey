@@ -1,6 +1,6 @@
-# Contributing to credmap
+# Contributing to passkey
 
-credmap reads the most sensitive files on a machine and prints about them. Two
+passkey reads the most sensitive files on a machine and prints about them. Two
 rules follow from that and everything else is negotiable: **it never writes to a
 credential file**, and **it never prints a secret unless you asked for one**.
 Keep both true and your change is welcome.
@@ -8,11 +8,11 @@ Keep both true and your change is welcome.
 ## Getting started
 
 ```bash
-git clone https://github.com/c-wenlong/credmap.git
-cd credmap
+git clone https://github.com/starship-terminal/passkey.git
+cd passkey
 uv sync                      # the venv is not portable; re-run after a move
 uv run pytest -q             # 230 tests, about 5 seconds
-uv run python -m credmap     # run without installing
+uv run python -m passkey     # run without installing
 ```
 
 `uv.lock` is committed and CI runs `uv sync --locked`, which fails if the lock
@@ -34,7 +34,7 @@ each test file covers, and how the fixtures are built.
 
 ## Project layout
 
-Twelve modules under `src/credmap/`, counting `__init__.py` and `__main__.py`.
+Twelve modules under `src/passkey/`, counting `__init__.py` and `__main__.py`.
 The load-bearing seam is that **the registry is data and the parsers are
 behaviour**: adding a provider should be a `Store(...)` literal and nothing
 else. The ten that carry logic:
@@ -50,19 +50,19 @@ else. The ten that carry logic:
 | `liveness.py` | `--check` probes: subprocess without a shell, hard timeouts, a thread pool under a deadline |
 | `doctor.py` | Anomaly checks over a completed scan |
 | `render.py` | Grouped scan output, flat tables, JSON |
-| `cli.py` | argparse, and the rewrite that turns a bare `credmap aws` into `where aws` |
+| `cli.py` | argparse, and the rewrite that turns a bare `passkey aws` into `where aws` |
 
 [docs/architecture.md](docs/architecture.md) explains the data flow and why the
 per-path and merged profile views must not be collapsed.
 
 ## What to contribute
 
-- **New stores.** A provider credmap does not know about is a `Store` entry in
+- **New stores.** A provider passkey does not know about is a `Store` entry in
   `registry.py`. Set `marker=True` on the path whose existence proves the store
   is real (a directory is not proof), mark secret files `role="secrets"`, and
   list identifiers that look secret but must stay visible in `id_fields`. Users
   can prototype one without touching the package through the
-  `~/.config/credmap/registry.toml` overlay, documented in
+  `~/.config/passkey/registry.toml` overlay, documented in
   [docs/registry-toml.md](docs/registry-toml.md).
 - **New parsers.** A credential format nothing in `parsers.py` handles yet.
   Parsers return a `ParseResult`; they never raise.
@@ -72,7 +72,7 @@ per-path and merged profile views must not be collapsed.
 
 ## Guidelines
 
-1. **credmap never writes to a credential file.** No `open()` for writing, no
+1. **passkey never writes to a credential file.** No `open()` for writing, no
    `write_text`, `unlink`, `rename`, `shutil` or `mkdir` anywhere in the
    package. Output goes through `sys.stdout.write`. SQLite is opened read-only
    by URI. This is the property the whole tool rests on, so a change that adds
@@ -108,7 +108,7 @@ zizmor, measures coverage, smoke-tests the built wheel against a temporary
 
 ## Reporting bugs
 
-Use the [bug report form](https://github.com/c-wenlong/credmap/issues/new?template=bug_report.yml).
+Use the [bug report form](https://github.com/starship-terminal/passkey/issues/new?template=bug_report.yml).
 Redact before you paste: `--reveal` output is never safe to share, and paths and
 profile names can identify you even when the secrets are masked.
 

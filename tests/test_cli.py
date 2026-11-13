@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import json
+import runpy
+import sys
+from pathlib import Path
 
 import pytest
 
-from credmap.cli import main
+from passkey.cli import main
 
 from .conftest import ALL_SECRETS
+
+NOTICE = "credmap is now passkey; `credmap` still runs for this release\n"
 
 
 def run(capsys, *argv) -> tuple[int, str]:
@@ -30,7 +35,7 @@ def write_overlay(home, text: str, mode: int = 0o600, dir_mode: int = 0o700) -> 
     umask 002 gets 0775 out of ``mkdir``. Leaving that to chance made this
     helper pass on CI and fail on such a machine.
     """
-    overlay = home / ".config/credmap/registry.toml"
+    overlay = home / ".config/passkey/registry.toml"
     overlay.parent.mkdir(parents=True, exist_ok=True)
     overlay.write_text(text, encoding="utf-8")
     overlay.chmod(mode)
@@ -184,3 +189,31 @@ def test_an_owner_only_overlay_is_applied_silently(fake_home, capsys):
     assert code == 0
     assert "Work AWS" in out
     assert err == ""
+
+
+def test_the_credmap_console_script_notices_once_and_keeps_json(
+    fake_home, capsys, monkeypatch
+):
+    """The installed `credmap` entry point calls main() with argv left as None."""
+    monkeypatch.setattr(sys, "argv", ["credmap", "--json"])
+    code = main()
+    captured = capsys.readouterr()
+    assert code == 0
+    json.loads(captured.out)
+    assert captured.err == NOTICE
+
+
+def test_python_m_credmap_notices_once_and_keeps_json(fake_home, capsys, monkeypatch):
+    """python -m credmap prints the notice in __main__, then runs the same command."""
+    import credmap
+
+    # argv[0] is the module path, so cli.main must not print a second notice.
+    monkeypatch.setattr(
+        sys, "argv", [str(Path(credmap.__file__).parent / "__main__.py"), "--json"]
+    )
+    with pytest.raises(SystemExit) as caught:
+        runpy.run_module("credmap", run_name="__main__")
+    captured = capsys.readouterr()
+    assert caught.value.code == 0
+    json.loads(captured.out)
+    assert captured.err == NOTICE

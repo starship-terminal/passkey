@@ -1,7 +1,7 @@
 # Extending the registry
 
 Providers can be added, or built-ins adjusted, without editing the package.
-credmap reads `~/.config/credmap/registry.toml` on every run. `XDG_CONFIG_HOME`
+passkey reads `~/.config/passkey/registry.toml` on every run. `XDG_CONFIG_HOME`
 relocates it along with everything else.
 
 The file is merged over the built-ins by store id. A malformed file is ignored
@@ -124,7 +124,7 @@ Redaction is default-deny, so a store added here is safe before its field list
 is curated: any field whose name looks secret is masked. Add identifiers you
 need to see to `id_fields` rather than relying on the heuristic.
 
-The overlay can point credmap at any readable file and can declare any probe
+The overlay can point passkey at any readable file and can declare any probe
 command, so it carries the same trust as your shell profile. A
 `registry.toml` that is writable by group or others is ignored, and a
 warning is printed to stderr once per run saying so. Its parent directory is

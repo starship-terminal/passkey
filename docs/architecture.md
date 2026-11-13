@@ -1,6 +1,6 @@
 # Architecture
 
-credmap is about 3,000 lines of Python in twelve modules with one runtime
+passkey is about 3,000 lines of Python in twelve modules with one runtime
 dependency, PyYAML. The design has one load-bearing seam: **the registry is
 data, the parsers are behaviour.** Adding a provider is a `Store(...)` literal
 and nothing else. If provider-specific code appears in `scan.py` or

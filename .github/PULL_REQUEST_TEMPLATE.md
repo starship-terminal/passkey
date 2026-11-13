@@ -17,7 +17,7 @@
 - [ ] No credential-like file committed. Fixtures are generated in `tests/conftest.py`
 - [ ] The read-only invariant holds: no write, rename, unlink or mkdir against a credential path
 - [ ] No new output channel bypasses `redact.scrub`, and any new renderer is in `tests/test_redact.py`'s `_all_output()`
-- [ ] Docs and `credmap --help` updated if user-facing behaviour changed
+- [ ] Docs and `passkey --help` updated if user-facing behaviour changed
 - [ ] `CHANGELOG.md` has an entry
 - [ ] One concern per PR
 
@@ -26,6 +26,6 @@
 <!-- How did you verify this? Run against a throwaway $HOME, not your real one. -->
 
 ```bash
-HOME="$(mktemp -d)" uv run credmap ...
+HOME="$(mktemp -d)" uv run passkey ...
 uv run pytest -q
 ```

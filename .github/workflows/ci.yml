@@ -70,7 +70,7 @@ jobs:
           python-version: "3.13"
       - run: uv sync --locked
       - name: Run the suite under coverage
-        run: uv run pytest -q --cov=credmap --cov-report=term-missing --cov-report=xml
+        run: uv run pytest -q --cov=passkey --cov-report=term-missing --cov-report=xml
       - name: Upload coverage to Codecov
         # Pinned to a commit, not a tag: this is the only step handed a secret,
         # so a moved tag must not be able to change the code that reads it.
@@ -96,18 +96,22 @@ jobs:
       - name: Build the wheel
         run: uv build --no-sources
       - name: Install the wheel into a fresh venv and run it
-        # Runs the installed `credmap` entry point, not the source tree, so a
+        # Runs the installed `passkey` entry point, not the source tree, so a
         # module that exists in src/ but is missing from the wheel is caught.
         # $HOME is a temp dir: a scan reads the real home otherwise.
         run: |
-          uv venv /tmp/credmap-wheel
-          uv pip install --python /tmp/credmap-wheel/bin/python dist/credmap_cli-*.whl
+          uv venv /tmp/passkey-wheel
+          uv pip install --python /tmp/passkey-wheel/bin/python dist/passkey-*.whl
           test_home="$(mktemp -d)"
           cd /tmp
-          HOME="$test_home" /tmp/credmap-wheel/bin/credmap --help
-          HOME="$test_home" /tmp/credmap-wheel/bin/credmap --version
-          HOME="$test_home" /tmp/credmap-wheel/bin/credmap --json
-          HOME="$test_home" /tmp/credmap-wheel/bin/credmap doctor --json
+          HOME="$test_home" /tmp/passkey-wheel/bin/passkey --help
+          HOME="$test_home" /tmp/passkey-wheel/bin/passkey --version
+          HOME="$test_home" /tmp/passkey-wheel/bin/passkey --json
+          HOME="$test_home" /tmp/passkey-wheel/bin/passkey doctor --json
+          # The previous command still runs, says so once, and keeps JSON valid.
+          HOME="$test_home" /tmp/passkey-wheel/bin/credmap --json > /tmp/credmap-out.json 2> /tmp/credmap-err.txt
+          python -c 'import json; json.load(open("/tmp/credmap-out.json"))'
+          grep -qx 'credmap is now passkey; `credmap` still runs for this release' /tmp/credmap-err.txt
 
   nix:
     name: Nix flake build and check
@@ -126,8 +130,8 @@ jobs:
       - name: Exercise the built binary
         run: |
           test_home="$(mktemp -d)"
-          HOME="$test_home" ./result/bin/credmap --help
-          HOME="$test_home" ./result/bin/credmap --json
+          HOME="$test_home" ./result/bin/passkey --help
+          HOME="$test_home" ./result/bin/passkey --json
       # The flake declares no `checks` output; this validates that every
       # package, app and devShell still evaluates.
       - name: nix flake check

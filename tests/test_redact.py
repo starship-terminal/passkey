@@ -10,10 +10,10 @@ from __future__ import annotations
 
 import pytest
 
-from credmap.doctor import diagnose
-from credmap.redact import is_secret, mask, scrub, scrub_text
-from credmap.registry import load
-from credmap.render import (
+from passkey.doctor import diagnose
+from passkey.redact import is_secret, mask, scrub, scrub_text
+from passkey.registry import load
+from passkey.render import (
     findings_to_dict,
     render_findings,
     render_scan,
@@ -22,7 +22,7 @@ from credmap.render import (
     styler,
     to_json,
 )
-from credmap.scan import scan
+from passkey.scan import scan
 
 from .conftest import ALL_SECRETS, AWS_KEY_ID, REVEALABLE_SECRETS
 

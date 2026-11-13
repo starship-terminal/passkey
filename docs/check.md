@@ -1,6 +1,6 @@
 # --check: liveness probes
 
-`--check` is the only thing in credmap that touches the network or runs
+`--check` is the only thing in passkey that touches the network or runs
 another program. It is available on `scan`, `show` and `doctor`. Without it,
 every command is offline and finishes in about a tenth of a second.
 

@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="assets/banner.png" alt="credmap mascot: a pixel-art detective puppy with a magnifying glass beside a wooden signpost, under AWS, Google Cloud and Azure logos drawn as clouds" width="800">
+  <img src="brand/banners/banner-readme-1280x320.png" alt="passkey" width="800">
 </p>
 
 <h1 align="center">
-credmap
+passkey
 </h1>
 
 <p align="center">
@@ -11,8 +11,8 @@ credmap
 </p>
 
 <p align="center">
-  <a href="https://github.com/c-wenlong/credmap/actions/workflows/ci.yml"><img src="https://github.com/c-wenlong/credmap/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://app.codecov.io/gh/c-wenlong/credmap"><img src="https://codecov.io/gh/c-wenlong/credmap/graph/badge.svg?token=6Z35ZNY7SK&amp;branch=main" alt="Coverage"></a>
+  <a href="https://github.com/starship-terminal/passkey/actions/workflows/ci.yml"><img src="https://github.com/starship-terminal/passkey/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://app.codecov.io/gh/starship-terminal/passkey"><img src="https://codecov.io/gh/starship-terminal/passkey/graph/badge.svg?token=6Z35ZNY7SK&amp;branch=main" alt="Coverage"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.11%2B-blue.svg" alt="Python 3.11+"></a>
   <img src="https://img.shields.io/badge/deps-PyYAML%20only-brightgreen.svg" alt="deps: PyYAML only">
@@ -31,10 +31,10 @@ credmap
 ---
 
 Credentials end up in a dozen places, in ten formats, under four different base
-directories. `credmap` builds an index so you can stop guessing.
+directories. `passkey` builds an index so you can stop guessing.
 
 ```
-$ credmap where gcp
+$ passkey where gcp
   STORE       PATH                                                   FORMAT         ROLE                 PRESENT
   gcloud      ~/.config/gcloud/credentials.db                        sqlite-gcloud  secrets      marker  yes
   gcloud      ~/.config/gcloud/access_tokens.db                      sqlite-gcloud  token-cache          yes
@@ -66,32 +66,36 @@ Four rules a path list gets wrong, each drawn from a real machine:
 ## Install
 
 With Nix, pin a release tag as a flake input and add the package to your
-list; `nix run github:c-wenlong/credmap` works for a one-off:
+list; `nix run github:starship-terminal/passkey` works for a one-off:
 
 ```nix
-inputs.credmap = {
-  url = "github:c-wenlong/credmap/v0.1.4";
+inputs.passkey = {
+  # v0.1.4 still ships the credmap command. Pin a tag once the next
+  # release is cut. Until then the default branch has the passkey command,
+  # and flake.lock pins the commit.
+  url = "github:starship-terminal/passkey";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 # then, in home.packages or environment.systemPackages:
-inputs.credmap.packages.${pkgs.stdenv.hostPlatform.system}.default
+inputs.passkey.packages.${pkgs.stdenv.hostPlatform.system}.default
 ```
 
 From a checkout:
 
 ```bash
-git clone https://github.com/c-wenlong/credmap
-uv tool install ./credmap
+git clone https://github.com/starship-terminal/passkey
+cd passkey
+uv tool install .
 ```
 
-That puts `credmap` on your PATH at `~/.local/bin/credmap`. The install is a
+That puts `passkey` on your PATH at `~/.local/bin/passkey`. The install is a
 copy, not a link, so re-run it with `--force` after changing the source. For a
 live-editing install, use `uv tool install -e .` from this directory instead.
 
-Nothing is published to PyPI yet. The distribution name is reserved as
-`credmap-cli`, because `credmap` there is held by an unrelated 2022 upload;
-the command stays `credmap` either way. When the publish job is switched on,
-`uv tool install credmap-cli` is the route.
+Nothing is published to PyPI yet. The distribution name is `passkey`
+(`passkey-cli` is an unrelated password manager). The previous command
+`credmap` still runs for one release. When the publish job is switched on,
+`uv tool install passkey` is the route.
 
 Requirements: Python 3.11 or newer, macOS or Linux, and one runtime
 dependency, PyYAML.
@@ -103,14 +107,14 @@ why there is no Homebrew tap.
 
 | Command | What it does |
 |---|---|
-| `credmap` | What credential stores exist here (alias for `scan`) |
-| `credmap where <query>` | Locate a provider: `gcp`, `k8s`, `aws`, `github`… |
-| `credmap show <store>` | Every profile and field, secrets masked |
-| `credmap paths` | The full registry of known paths, present or not |
-| `credmap doctor` | Problems only |
+| `passkey` | What credential stores exist here (alias for `scan`) |
+| `passkey where <query>` | Locate a provider: `gcp`, `k8s`, `aws`, `github`… |
+| `passkey show <store>` | Every profile and field, secrets masked |
+| `passkey paths` | The full registry of known paths, present or not |
+| `passkey doctor` | Problems only |
 
-A first word that names a store is a `where` on its own, so `credmap aws` is
-`credmap where aws`. Anything else falls through to `scan`.
+A first word that names a store is a `where` on its own, so `passkey aws` is
+`passkey where aws`. Anything else falls through to `scan`.
 
 Flags are per-verb, not global. `--json` is on all five. `--all` (include
 absent stores) is `scan` only, `--found` (drop absent paths) is `paths` only,
@@ -154,8 +158,8 @@ check. Warnings and info alone exit 0.
 
 ## Extending
 
-credmap ships 26 providers. Add your own without editing the package, in
-`~/.config/credmap/registry.toml`:
+passkey ships 26 providers. Add your own without editing the package, in
+`~/.config/passkey/registry.toml`:
 
 ```toml
 [acme]
@@ -221,7 +225,7 @@ Issues and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers
 the setup, the invariants a change must not break, and what CI runs. Please
 don't open a public issue for a security problem: [SECURITY.md](SECURITY.md)
 has the reporting route, and [docs/security.md](docs/security.md) describes
-what credmap does and does not guarantee.
+what passkey does and does not guarantee.
 
 ## License
 

@@ -7,12 +7,12 @@ import textwrap
 
 import pytest
 
-from credmap import registry
-from credmap.doctor import diagnose
-from credmap.redact import is_secret
-from credmap.registry import find, load
-from credmap.resolve import config_home, resolve
-from credmap.scan import scan, scan_store
+from passkey import registry
+from passkey.doctor import diagnose
+from passkey.redact import is_secret
+from passkey.registry import find, load
+from passkey.resolve import config_home, resolve
+from passkey.scan import scan, scan_store
 
 
 def result_for(sid: str):
@@ -118,7 +118,7 @@ def test_kind_lookup_returns_a_group():
 
 
 def test_toml_overlay_adds_a_store(fake_home):
-    overlay = config_home() / "credmap/registry.toml"
+    overlay = config_home() / "passkey/registry.toml"
     overlay.parent.mkdir(parents=True, exist_ok=True)
     overlay.write_text(
         """
@@ -145,7 +145,7 @@ def test_toml_overlay_adds_a_store(fake_home):
 
 
 def test_broken_overlay_is_ignored_not_fatal(fake_home):
-    overlay = config_home() / "credmap/registry.toml"
+    overlay = config_home() / "passkey/registry.toml"
     overlay.parent.mkdir(parents=True, exist_ok=True)
     overlay.write_text("this is not [ valid toml", encoding="utf-8")
     overlay.chmod(0o600)
@@ -154,7 +154,7 @@ def test_broken_overlay_is_ignored_not_fatal(fake_home):
 
 
 def write_overlay(text: str, mode: int = 0o600, dir_mode: int = 0o700) -> None:
-    overlay = config_home() / "credmap/registry.toml"
+    overlay = config_home() / "passkey/registry.toml"
     overlay.parent.mkdir(parents=True, exist_ok=True)
     overlay.write_text(textwrap.dedent(text), encoding="utf-8")
     # Both modes are set explicitly, because load() refuses an overlay anyone
@@ -166,7 +166,7 @@ def write_overlay(text: str, mode: int = 0o600, dir_mode: int = 0o700) -> None:
 
 
 def write_overlay_bytes(data: bytes, mode: int = 0o600) -> None:
-    overlay = config_home() / "credmap/registry.toml"
+    overlay = config_home() / "passkey/registry.toml"
     overlay.parent.mkdir(parents=True, exist_ok=True)
     overlay.write_bytes(data)
     overlay.chmod(mode)
@@ -335,11 +335,61 @@ def test_a_group_or_world_writable_overlay_directory_is_refused(fake_home, dir_m
         assert store("aws").name == "AWS CLI"
         assert "writable by group or others" in registry.OVERLAY_WARNING
         # The message must name the directory, not the file that is fine.
-        assert f"its directory ~/.config/credmap has mode {dir_mode:04o}" in (
+        assert f"its directory ~/.config/passkey has mode {dir_mode:04o}" in (
             registry.OVERLAY_WARNING
         )
     finally:
-        (config_home() / "credmap").chmod(0o700)
+        (config_home() / "passkey").chmod(0o700)
+
+
+def _write_named_overlay(dirname: str, text: str) -> None:
+    overlay = config_home() / dirname / "registry.toml"
+    overlay.parent.mkdir(parents=True, exist_ok=True)
+    overlay.write_text(textwrap.dedent(text), encoding="utf-8")
+    overlay.chmod(0o600)
+    overlay.parent.chmod(0o700)
+
+
+def test_a_legacy_overlay_is_read_when_the_new_file_is_absent(fake_home):
+    """A leftover ~/.config/credmap/registry.toml still applies."""
+    _write_named_overlay("credmap", '[aws]\nname = "Legacy AWS"\n')
+    assert store("aws").name == "Legacy AWS"
+    assert registry.overlay_path() == config_home() / "credmap/registry.toml"
+
+
+def test_the_new_overlay_wins_when_both_files_exist(fake_home):
+    """The old file is a fallback, never a second merge."""
+    _write_named_overlay("credmap", '[aws]\nname = "Legacy AWS"\n')
+    _write_named_overlay("passkey", '[aws]\nname = "New AWS"\n')
+    assert store("aws").name == "New AWS"
+    assert registry.overlay_path() == config_home() / "passkey/registry.toml"
+
+
+def test_an_unreadable_new_config_dir_falls_through_to_the_legacy_file(fake_home):
+    """Python 3.11 raises PermissionError from Path.is_file on an unsearchable parent.
+
+    That used to escape load() and turn `passkey scan` into a traceback.
+    """
+    _write_named_overlay("credmap", '[aws]\nname = "Legacy AWS"\n')
+    blocked = config_home() / "passkey"
+    blocked.mkdir(parents=True, exist_ok=True)
+    blocked.chmod(0o000)
+    try:
+        assert registry.overlay_path() == config_home() / "credmap/registry.toml"
+        assert store("aws").name == "Legacy AWS"
+    finally:
+        blocked.chmod(0o700)
+
+
+def test_an_unreadable_config_dir_with_no_legacy_file_is_skipped(fake_home):
+    blocked = config_home() / "passkey"
+    blocked.mkdir(parents=True, exist_ok=True)
+    blocked.chmod(0o000)
+    try:
+        assert registry.overlay_path() == config_home() / "passkey/registry.toml"
+        assert store("aws").name == "AWS CLI"
+    finally:
+        blocked.chmod(0o700)
 
 
 def test_a_0755_overlay_directory_is_fine(fake_home):
@@ -349,7 +399,7 @@ def test_a_0755_overlay_directory_is_fine(fake_home):
         assert store("aws").name == "Work AWS"
         assert registry.OVERLAY_WARNING == ""
     finally:
-        (config_home() / "credmap").chmod(0o700)
+        (config_home() / "passkey").chmod(0o700)
 
 
 # --------------------------------------------------------------------------

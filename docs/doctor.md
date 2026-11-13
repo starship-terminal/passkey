@@ -1,9 +1,9 @@
 # doctor
 
-`credmap doctor` runs a set of checks over a completed scan and prints only
+`passkey doctor` runs a set of checks over a completed scan and prints only
 problems. It is offline unless `--check` is given. Each finding has a level,
 a store, a message, and where possible the provider command that fixes it.
-credmap never runs that command itself.
+passkey never runs that command itself.
 
 ## Checks
 
@@ -33,7 +33,7 @@ Duplicate findings with the same level, store and message are collapsed.
 
 `doctor` exits 1 only when an `error`-level finding exists, and the only
 `error` today is a profile that `--check` proved dead. Warnings and info exit
-0, so `credmap doctor` works as a pre-flight check that fails only on
+0, so `passkey doctor` works as a pre-flight check that fails only on
 something provable.
 
 That also means an offline `doctor` can never exit non-zero. An unreadable
@@ -42,14 +42,14 @@ credentials file is a warning.
 ## Examples
 
 ```
-$ credmap doctor
+$ passkey doctor
   warn  aws    ~/.aws/credentials is mode 0644 — readable by group or others
                fix: chmod 600 ~/.aws/credentials
   warn  aws    one secret is shared by 2 profiles (aws:default, aws:staging)
                fix: these are the same credential — revoking it breaks all of them
   info  docker secrets held in macOS Keychain, not in this file
 
-$ credmap doctor --json
+$ passkey doctor --json
 [
   {
     "level": "warn",

@@ -1,4 +1,4 @@
-# credmap — agent notes
+# passkey — agent notes
 
 Read-only CLI that indexes credential stores scattered across a machine.
 Python 3.11+, one runtime dependency (PyYAML), managed with `uv`.
@@ -6,13 +6,14 @@ Python 3.11+, one runtime dependency (PyYAML), managed with `uv`.
 ```bash
 uv sync                      # after a fresh clone or a move (the venv is not portable)
 uv run pytest -q             # 230 tests, ~5s (the liveness stubs use real timeouts)
-uv run python -m credmap     # run without installing
-uv tool install . --force    # put `credmap` on PATH
+uv run python -m passkey     # run without installing
+uv tool install . --force    # put `passkey` on PATH
 nix build                    # the package nix consumers get; runs the suite in the sandbox
 ```
 
-The PyPI distribution is `credmap-cli`; the import package and the command
-are both `credmap`. Full reference lives in [docs/](docs/README.md), and
+The PyPI distribution, the import package, and the command are all
+`passkey`. `credmap` remains a console script for one release. Full
+reference lives in [docs/](docs/README.md), and
 [docs/known-issues.md](docs/known-issues.md) is the ledger of what the
 2026-09-09 review found and which release closed it.
 
@@ -111,7 +112,7 @@ it breaks something specific.
 ## Where things go
 
 ```
-src/credmap/
+src/passkey/
   registry.py   THE DATA — one Store per provider. Edit this to add a provider.
   model.py      dataclasses for the registry schema and the result schema
   resolve.py    env override -> XDG -> template. The only place path rules live.
@@ -160,7 +161,7 @@ keep using `key in raw` rather than testing the parsed value. Keep
 `_store_from_toml` in step when you add a field to `Store` — a field the overlay
 cannot express is a field users cannot fix for themselves.
 
-The overlay is also a privilege boundary: it can point credmap at any readable
+The overlay is also a privilege boundary: it can point passkey at any readable
 file and can name any command for `--check`. A `registry.toml` (or its parent
 directory) writable by group or others is refused, with `OVERLAY_WARNING` printed
 once to stderr.

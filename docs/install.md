@@ -1,16 +1,17 @@
 # Installing
 
-credmap is pure Python 3.11+ with one dependency, PyYAML. It runs on macOS and
-Linux. The binary name is `credmap` whichever route you use.
+passkey is pure Python 3.11+ with one dependency, PyYAML. It runs on macOS and
+Linux. The binary name is `passkey` whichever route you use.
 
 ## From a checkout
 
 ```bash
-git clone https://github.com/c-wenlong/credmap
-uv tool install ./credmap
+git clone https://github.com/starship-terminal/passkey
+cd passkey
+uv tool install .
 ```
 
-That puts `credmap` at `~/.local/bin/credmap`. The install is a copy, not a
+That puts `passkey` at `~/.local/bin/passkey`. The install is a copy, not a
 link, so re-run with `--force` after changing the source. For a live-editing
 install, run `uv tool install -e .` inside the checkout.
 
@@ -22,14 +23,17 @@ exist.
 ## With Nix (recommended for nix-darwin and home-manager users)
 
 The repository ships a `flake.nix`. Add it as an input pinned to a release
-tag and put the package in your list. `nix run github:c-wenlong/credmap`
+tag and put the package in your list. `nix run github:starship-terminal/passkey`
 also works for a one-off. Both edits are shown against a nix-darwin plus home-manager flake.
 
 In your `flake.nix` inputs:
 
 ```nix
-credmap = {
-  url = "github:c-wenlong/credmap/v0.1.4";
+passkey = {
+  # v0.1.4 still ships the credmap command. Pin a tag once the next
+  # release is cut. Until then the default branch has the passkey command,
+  # and flake.lock pins the commit.
+  url = "github:starship-terminal/passkey";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 ```
@@ -59,14 +63,14 @@ shadow `inputs`:
 home.packages = with pkgs; [
   # ... existing packages
 ] ++ [
-  inputs.credmap.packages.${pkgs.stdenv.hostPlatform.system}.default
+  inputs.passkey.packages.${pkgs.stdenv.hostPlatform.system}.default
 ];
 ```
 
 Upgrade by editing the tag, then:
 
 ```bash
-nix flake update credmap
+nix flake update passkey
 sudo darwin-rebuild switch --flake ~/.dotfiles#mac
 ```
 
@@ -99,22 +103,23 @@ rebuilds. All of this goes away if the repo is public.
 Remove the old copy so two binaries are not on PATH:
 
 ```bash
-uv tool uninstall credmap
+uv tool uninstall passkey
 ```
 
 ## From PyPI
 
-Nothing is published yet. The distribution name is reserved as `credmap-cli`
-because `credmap` on PyPI is held by an unrelated 2022 upload, and the
-command stays `credmap` either way. The release workflow carries the publish
-job but skips it unless the repository variable `PUBLISH_TO_PYPI` is `true`,
-which also needs a registered Trusted Publisher and a `pypi` environment;
-see [releasing.md](releasing.md). Once it is switched on:
+Nothing is published yet. The distribution name is `passkey`. `passkey` is
+free on PyPI. `passkey-cli` is an unrelated password manager, so it is not
+used. The previous command `credmap` still runs for one release and prints
+a one-line notice. The release workflow carries the publish job but skips
+it unless the repository variable `PUBLISH_TO_PYPI` is `true`, which also
+needs a registered Trusted Publisher and a `pypi` environment; see
+[releasing.md](releasing.md). Once it is switched on:
 
 ```bash
-uv tool install credmap-cli
+uv tool install passkey
 # or
-pipx install credmap-cli
+pipx install passkey
 ```
 
 ## Homebrew
@@ -131,6 +136,6 @@ cannot be fetched at all. The formula skeleton is kept in
 ## Verifying
 
 ```bash
-credmap --version
-credmap paths --json | head
+passkey --version
+passkey paths --json | head
 ```

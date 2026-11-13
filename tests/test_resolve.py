@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from credmap.model import PathSpec
-from credmap.resolve import display, expand, overridden_by, resolve
+from passkey.model import PathSpec
+from passkey.resolve import display, expand, overridden_by, resolve
 
 
 @pytest.fixture

@@ -1,6 +1,6 @@
 # Security posture
 
-credmap reads the most sensitive files on a machine and prints about them.
+passkey reads the most sensitive files on a machine and prints about them.
 This page states what it does and does not do, so you can decide whether to
 run it, and what to do before you paste its output anywhere.
 
@@ -50,7 +50,7 @@ than an exit-1 error, because `doctor` fails only on something provable. See
 ## Things to know
 
 - **Symlinks are followed.** A `~/.aws/credentials` symlinked elsewhere is read, and the permission audit reports the target's real mode. This is by design; it is your home.
-- **The overlay has your full authority.** `~/.config/credmap/registry.toml` can point credmap at any readable file and can declare any command for `--check`. A group- or world-writable overlay is ignored with a warning, and its parent directory is checked by the same rule, since write permission on a directory is permission to replace the file in it.
+- **The overlay has your full authority.** `~/.config/passkey/registry.toml` can point passkey at any readable file and can declare any command for `--check`. A group- or world-writable overlay is ignored with a warning, and its parent directory is checked by the same rule, since write permission on a directory is permission to replace the file in it.
 - **The fingerprint reveals the last four characters** of any secret of 16 characters or more, plus its length. Shorter values show only their length.
 - **Provider CLI output is masked by shape.** Under `--check`, any run of 20 or more token-alphabet characters in a CLI's stdout or stderr is fingerprinted before it is shown, and only the first 64 KiB is read.
 - **Terminal transcripts persist.** Default output is designed to be safe to paste. `--reveal` output is not, and is never implied.
