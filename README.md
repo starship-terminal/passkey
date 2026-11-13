@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="passkey mascot: a pixel-art detective puppy with a magnifying glass beside a wooden signpost, under AWS, Google Cloud and Azure logos drawn as clouds" width="800">
+  <img src="brand/banners/banner-readme-1280x320.png" alt="passkey" width="800">
 </p>
 
 <h1 align="center">
