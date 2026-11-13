@@ -561,15 +561,30 @@ BUILTIN: tuple[Store, ...] = (
 OVERLAY_WARNING = ""
 
 
+def _is_file(path: Path) -> bool:
+    """Whether ``path`` is a file, or False when the directory cannot be searched.
+
+    On Python 3.11, ``Path.is_file`` raises ``PermissionError`` (an
+    ``OSError``) when a parent directory is unsearchable. An optional config
+    folder must not turn that into a traceback.
+    """
+    try:
+        return path.is_file()
+    except OSError:
+        return False
+
+
 def overlay_path() -> Path:
     """The overlay to read. New path wins; the old name is the fallback.
 
     Never writes, and never moves the old file. A missing directory is not
-    created, so asking for the path does not touch the disk.
+    created, so asking for the path does not touch the disk. An unreadable
+    ``~/.config/passkey`` falls through to the old file when that one is
+    readable, and to the new path (which ``load`` then skips) otherwise.
     """
     current = config_home() / "passkey" / "registry.toml"
     legacy = config_home() / "credmap" / "registry.toml"
-    if current.is_file() or not legacy.is_file():
+    if _is_file(current) or not _is_file(legacy):
         return current
     return legacy
 
@@ -726,7 +741,7 @@ def load() -> tuple[Store, ...]:
 
     stores = {s.id: s for s in BUILTIN}
     path = overlay_path()
-    if not path.is_file():
+    if not _is_file(path):
         return tuple(stores.values())
 
     unsafe = _unsafe_overlay(path)

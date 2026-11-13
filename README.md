@@ -70,7 +70,10 @@ list; `nix run github:starship-terminal/passkey` works for a one-off:
 
 ```nix
 inputs.passkey = {
-  url = "github:starship-terminal/passkey/v0.1.4";
+  # v0.1.4 still ships the credmap command. Pin a tag once the next
+  # release is cut. Until then the default branch has the passkey command,
+  # and flake.lock pins the commit.
+  url = "github:starship-terminal/passkey";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 # then, in home.packages or environment.systemPackages:
@@ -81,6 +84,7 @@ From a checkout:
 
 ```bash
 git clone https://github.com/starship-terminal/passkey
+cd passkey
 uv tool install .
 ```
 

@@ -342,6 +342,56 @@ def test_a_group_or_world_writable_overlay_directory_is_refused(fake_home, dir_m
         (config_home() / "passkey").chmod(0o700)
 
 
+def _write_named_overlay(dirname: str, text: str) -> None:
+    overlay = config_home() / dirname / "registry.toml"
+    overlay.parent.mkdir(parents=True, exist_ok=True)
+    overlay.write_text(textwrap.dedent(text), encoding="utf-8")
+    overlay.chmod(0o600)
+    overlay.parent.chmod(0o700)
+
+
+def test_a_legacy_overlay_is_read_when_the_new_file_is_absent(fake_home):
+    """A leftover ~/.config/credmap/registry.toml still applies."""
+    _write_named_overlay("credmap", '[aws]\nname = "Legacy AWS"\n')
+    assert store("aws").name == "Legacy AWS"
+    assert registry.overlay_path() == config_home() / "credmap/registry.toml"
+
+
+def test_the_new_overlay_wins_when_both_files_exist(fake_home):
+    """The old file is a fallback, never a second merge."""
+    _write_named_overlay("credmap", '[aws]\nname = "Legacy AWS"\n')
+    _write_named_overlay("passkey", '[aws]\nname = "New AWS"\n')
+    assert store("aws").name == "New AWS"
+    assert registry.overlay_path() == config_home() / "passkey/registry.toml"
+
+
+def test_an_unreadable_new_config_dir_falls_through_to_the_legacy_file(fake_home):
+    """Python 3.11 raises PermissionError from Path.is_file on an unsearchable parent.
+
+    That used to escape load() and turn `passkey scan` into a traceback.
+    """
+    _write_named_overlay("credmap", '[aws]\nname = "Legacy AWS"\n')
+    blocked = config_home() / "passkey"
+    blocked.mkdir(parents=True, exist_ok=True)
+    blocked.chmod(0o000)
+    try:
+        assert registry.overlay_path() == config_home() / "credmap/registry.toml"
+        assert store("aws").name == "Legacy AWS"
+    finally:
+        blocked.chmod(0o700)
+
+
+def test_an_unreadable_config_dir_with_no_legacy_file_is_skipped(fake_home):
+    blocked = config_home() / "passkey"
+    blocked.mkdir(parents=True, exist_ok=True)
+    blocked.chmod(0o000)
+    try:
+        assert registry.overlay_path() == config_home() / "passkey/registry.toml"
+        assert store("aws").name == "AWS CLI"
+    finally:
+        blocked.chmod(0o700)
+
+
 def test_a_0755_overlay_directory_is_fine(fake_home):
     """0755 is the ordinary mode mkdir leaves; only *write* bits are a problem."""
     write_overlay('[aws]\nname = "Work AWS"\n', mode=0o600, dir_mode=0o755)

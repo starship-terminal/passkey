@@ -108,6 +108,10 @@ jobs:
           HOME="$test_home" /tmp/passkey-wheel/bin/passkey --version
           HOME="$test_home" /tmp/passkey-wheel/bin/passkey --json
           HOME="$test_home" /tmp/passkey-wheel/bin/passkey doctor --json
+          # The previous command still runs, says so once, and keeps JSON valid.
+          HOME="$test_home" /tmp/passkey-wheel/bin/credmap --json > /tmp/credmap-out.json 2> /tmp/credmap-err.txt
+          python -c 'import json; json.load(open("/tmp/credmap-out.json"))'
+          grep -qx 'credmap is now passkey; `credmap` still runs for this release' /tmp/credmap-err.txt
 
   nix:
     name: Nix flake build and check

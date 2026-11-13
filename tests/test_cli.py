@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 import json
+import runpy
+import sys
+from pathlib import Path
 
 import pytest
 
 from passkey.cli import main
+
+NOTICE = "credmap is now passkey; `credmap` still runs for this release\n"
 
 from .conftest import ALL_SECRETS
 
@@ -184,3 +189,29 @@ def test_an_owner_only_overlay_is_applied_silently(fake_home, capsys):
     assert code == 0
     assert "Work AWS" in out
     assert err == ""
+
+
+def test_the_credmap_console_script_notices_once_and_keeps_json(fake_home, capsys, monkeypatch):
+    """The installed `credmap` entry point calls main() with argv left as None."""
+    monkeypatch.setattr(sys, "argv", ["credmap", "--json"])
+    code = main()
+    captured = capsys.readouterr()
+    assert code == 0
+    json.loads(captured.out)
+    assert captured.err == NOTICE
+
+
+def test_python_m_credmap_notices_once_and_keeps_json(fake_home, capsys, monkeypatch):
+    """python -m credmap prints the notice in __main__, then runs the same command."""
+    import credmap
+
+    # argv[0] is the module path, so cli.main must not print a second notice.
+    monkeypatch.setattr(
+        sys, "argv", [str(Path(credmap.__file__).parent / "__main__.py"), "--json"]
+    )
+    with pytest.raises(SystemExit) as caught:
+        runpy.run_module("credmap", run_name="__main__")
+    captured = capsys.readouterr()
+    assert caught.value.code == 0
+    json.loads(captured.out)
+    assert captured.err == NOTICE
