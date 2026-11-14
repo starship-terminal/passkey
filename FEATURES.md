@@ -12,7 +12,7 @@ passkey is a read-only command-line tool that finds, parses and audits the crede
 - **Paths**: prints the full registry of known credential paths as a flat table, with `--found` dropping absent paths from the table and the JSON alike. Status: stable. Surface: CLI. Entry point: `passkey paths`. Tests: `tests/test_cli.py`.
 - **Doctor**: prints only problems found across all stores, each with the provider command that fixes it, and exits 1 only when a credential is provably dead. Status: stable. Surface: CLI. Entry point: `passkey doctor`. Tests: `tests/test_doctor.py`, `tests/test_registry.py`, `tests/test_cli.py`.
 - **JSON output**: emits machine-readable output on all five verbs, with the schema documented per verb. Status: stable. Surface: CLI. Entry point: `--json`, documented in `docs/json.md`. Tests: `tests/test_cli.py`.
-- **Exit codes**: returns 0 on success, 1 for a dead credential in `doctor`, 2 for no match or a bad flag, 130 on Ctrl-C, and 0 when stdout is a closed pipe. Status: stable. Surface: CLI. Entry point: `src/passkey/cli.py`. Tests: `tests/test_cli.py` covers 0, 1 and 2; guessing: no test covers 130 or the closed pipe.
+- **Exit codes**: returns 0 on success, 1 for a dead credential in `doctor`, 2 for no match or a bad flag, 130 on Ctrl-C, and 0 when stdout is a closed pipe. Status: stable. Surface: CLI. Entry point: `src/passkey/cli.py`. Tests: `tests/test_cli.py` covers 0 and 2; its doctor call only asserts the exit is 0 or 1 and does not force a dead credential. guessing: no test covers 130 or the closed pipe.
 - **Legacy `credmap` command**: keeps the old command name working for one release and prints a one-line notice. Status: beta (unreleased, on main). Surface: CLI. Entry point: `credmap`, `python -m credmap`. Tests: `tests/test_cli.py`.
 
 ## Store discovery
@@ -29,7 +29,7 @@ passkey is a read-only command-line tool that finds, parses and audits the crede
 
 - **Ten parsers**: reads `ini`, `inidir`, `json`, `yaml`, `sqlite-gcloud`, `netrc`, `jsondir`, `keydir`, `raw` and `opaque` stores. Status: stable. Surface: CLI. Entry point: `src/passkey/parsers.py`, documented in `docs/formats.md`. Tests: `tests/test_parsers.py`.
 - **Read-only SQLite**: opens gcloud's SQLite databases read-only through a percent-quoted URI, so a scan never locks or creates a database. Status: stable. Surface: CLI. Entry point: `parse_sqlite_gcloud` in `src/passkey/parsers.py`. Tests: `tests/test_parsers.py`.
-- **Broken files reported, not fatal**: shows a malformed or unreadable credential file in the scan with an error that names the format, line and exception class but never quotes the file. Status: stable. Surface: CLI. Entry point: `parsers.parse` in `src/passkey/parsers.py`. Tests: `tests/test_parsers.py`, `tests/test_redact.py`.
+- **Broken files reported, not fatal**: shows a malformed or unreadable credential file in the scan with an error instead of aborting; the details vary by parser, but never quote the file contents. Status: stable. Surface: CLI. Entry point: `parsers.parse` in `src/passkey/parsers.py`. Tests: `tests/test_parsers.py`, `tests/test_redact.py`.
 - **Partly unreadable config directories**: keeps the profiles it could read from a directory and warns with a count of the files it could not open. Status: stable. Surface: CLI. Entry point: `parse_inidir` in `src/passkey/parsers.py`. Tests: `tests/test_parsers.py`.
 - **Offline expiry detection**: marks cached tokens `expired` or `valid` from expiry times stored in the files, without a network call. Status: stable. Surface: CLI. Entry point: `src/passkey/parsers.py`. Tests: `tests/test_parsers.py`.
 
@@ -39,7 +39,7 @@ passkey is a read-only command-line tool that finds, parses and audits the crede
 - **Default-deny field names**: masks any field whose name looks secret even if no registry entry declared it, while keeping identifiers such as access key IDs, client IDs and projects visible. Status: stable. Surface: CLI. Entry point: `redact.is_secret` in `src/passkey/redact.py`, documented in `docs/redaction.md`. Tests: `tests/test_redact.py`, `tests/test_registry.py`.
 - **Multi-line values masked**: masks any value that spans lines, whatever its field is called, so an indented secret cannot hide inside a visible field. Status: stable. Surface: CLI. Entry point: `src/passkey/redact.py`. Tests: `tests/test_redact.py`.
 - **Masking text without a field name**: fingerprints token-shaped runs and caps the length of provider CLI output before it reaches you. Status: stable. Surface: CLI. Entry point: `redact.scrub_text` in `src/passkey/redact.py`. Tests: `tests/test_redact.py`, `tests/test_liveness.py`.
-- **Whole-program leak test**: runs every renderer, `doctor` included, over a synthetic home and fails if any sentinel secret appears in default output. Status: stable. Surface: CLI. Entry point: `_all_output()` in `tests/test_redact.py`. Tests: `tests/test_redact.py`.
+- **Whole-program leak test**: runs the scan, show, JSON and doctor renderers over a synthetic home and fails if any sentinel secret appears in default output. It does not cover the `paths` renderer (`render_paths`). Status: stable. Surface: CLI. Entry point: `_all_output()` in `tests/test_redact.py`. Tests: `tests/test_redact.py`.
 
 ## Doctor checks
 
