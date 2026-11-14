@@ -39,7 +39,7 @@ passkey is a read-only command-line tool that finds, parses and audits the crede
 - **Default-deny field names**: masks any field whose name looks secret even if no registry entry declared it, while keeping identifiers such as access key IDs, client IDs and projects visible. Status: stable. Surface: CLI. Entry point: `redact.is_secret` in `src/passkey/redact.py`, documented in `docs/redaction.md`. Tests: `tests/test_redact.py`, `tests/test_registry.py`.
 - **Multi-line values masked**: masks any value that spans lines, whatever its field is called, so an indented secret cannot hide inside a visible field. Status: stable. Surface: CLI. Entry point: `src/passkey/redact.py`. Tests: `tests/test_redact.py`.
 - **Masking text without a field name**: fingerprints token-shaped runs and caps the length of provider CLI output before it reaches you. Status: stable. Surface: CLI. Entry point: `redact.scrub_text` in `src/passkey/redact.py`. Tests: `tests/test_redact.py`, `tests/test_liveness.py`.
-- **Whole-program leak test**: runs every renderer, `doctor` included, over a synthetic home and fails if any sentinel secret appears in default output. Status: stable. Surface: docs. Entry point: `_all_output()` in `tests/test_redact.py`. Tests: `tests/test_redact.py`.
+- **Whole-program leak test**: runs every renderer, `doctor` included, over a synthetic home and fails if any sentinel secret appears in default output. Status: stable. Surface: CLI. Entry point: `_all_output()` in `tests/test_redact.py`. Tests: `tests/test_redact.py`.
 
 ## Doctor checks
 
