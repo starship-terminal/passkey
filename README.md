@@ -206,6 +206,7 @@ group or others is refused with a reason on stderr. Formats available: `ini`,
 code, the 26 built-in stores, the `--json` schema, the redaction rules,
 installing through Nix, the security model, and the open review findings.
 [AGENTS.md](AGENTS.md) is the short version for coding agents.
+[FEATURES.md](FEATURES.md) lists every feature, shipped or planned, with its tests.
 
 ## Development
 
